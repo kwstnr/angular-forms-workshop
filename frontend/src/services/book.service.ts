@@ -1,36 +1,28 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
-import { authors } from '../data/authors.data';
+import { Observable } from 'rxjs';
+import { Book } from '../model/book.model';
 
 @Injectable({
   providedIn: 'root',
 })
-class BookService {
+export class BookService {
+  private readonly apiUrl = 'http://localhost:3000/books';
+
+  constructor(private http: HttpClient) {}
+
+  // GET all books
   getBooks(): Observable<Book[]> {
-    return of(this._getBooksReference());
+    return this.http.get<Book[]>(this.apiUrl);
   }
 
-  getBook(id: string): Observable<Book | undefined> {
-    return this.getBooks().pipe(map((books) => books.find((b) => b.id === id)));
+  // GET a single book by ID
+  getBook(id: string): Observable<Book> {
+    return this.http.get<Book>(`${this.apiUrl}/${id}`);
   }
 
+  // PUT update a book by ID
   updateBook(id: string, changes: Partial<Book>): Observable<Book> {
-    var book = this._getBookReference(id);
-    if (!book) {
-      throw new Error('Book not found');
-    }
-
-    return of(Object.assign(book, changes));
-  }
-
-  private _getBookReference(id: string): Book | undefined {
-    return this._getBooksReference().find((b) => b.id === id);
-  }
-
-  private _getBooksReference(): Book[] {
-    return authors.reduce(
-      (acc, author) => acc.concat(author.books),
-      [] as Book[]
-    );
+    return this.http.put<Book>(`${this.apiUrl}/${id}`, changes);
   }
 }

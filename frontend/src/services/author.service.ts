@@ -1,35 +1,28 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
-import { authors } from '../data/authors.data';
+import { Observable } from 'rxjs';
+import { Author } from '../model/author.model';
 
 @Injectable({
   providedIn: 'root',
 })
-class AuthorService {
+export class AuthorService {
+  private readonly apiUrl = 'http://localhost:3000/authors';
+
+  constructor(private http: HttpClient) {}
+
+  // GET all authors
   getAuthors(): Observable<Author[]> {
-    return of(authors);
+    return this.http.get<Author[]>(this.apiUrl);
   }
 
-  getAuthor(id: string): Observable<Author | undefined> {
-    return this.getAuthors().pipe(
-      map((authors) => authors.find((a) => a.id === id))
-    );
+  // GET a single author by ID
+  getAuthor(id: string): Observable<Author> {
+    return this.http.get<Author>(`${this.apiUrl}/${id}`);
   }
 
+  // PUT update an author by ID
   updateAuthor(id: string, changes: Partial<Author>): Observable<Author> {
-    var author = this._getAuthorReference(id);
-    if (!author) {
-      throw new Error('Author not found');
-    }
-
-    return of(Object.assign(author, changes));
-  }
-
-  private _getAuthorsReference(): Author[] {
-    return authors;
-  }
-
-  private _getAuthorReference(id: string): Author | undefined {
-    return this._getAuthorsReference().find((a) => a.id === id);
+    return this.http.put<Author>(`${this.apiUrl}/${id}`, changes);
   }
 }

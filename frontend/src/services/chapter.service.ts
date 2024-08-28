@@ -1,47 +1,28 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
-import { authors } from '../data/authors.data';
+import { Observable } from 'rxjs';
+import { Chapter } from '../model/chapter.model';
 
 @Injectable({
   providedIn: 'root',
 })
-class ChapterService {
+export class ChapterService {
+  private readonly apiUrl = 'http://localhost:3000/chapters';
+
+  constructor(private http: HttpClient) {}
+
+  // GET all chapters
   getChapters(): Observable<Chapter[]> {
-    return of(this._getChaptersReferences());
+    return this.http.get<Chapter[]>(this.apiUrl);
   }
 
-  getChapter(id: string): Observable<Chapter | undefined> {
-    return this.getChapters().pipe(
-      map((chapters) => chapters.find((b) => b.id === id))
-    );
+  // GET a single chapter by ID
+  getChapter(id: string): Observable<Chapter> {
+    return this.http.get<Chapter>(`${this.apiUrl}/${id}`);
   }
 
+  // PUT update a chapter by ID
   updateChapter(id: string, changes: Partial<Chapter>): Observable<Chapter> {
-    var chapter = this._getChapterReference(id);
-    if (!chapter) {
-      throw new Error('Chapter not found');
-    }
-
-    return of(Object.assign(chapter, changes));
-  }
-
-  private _getChaptersReferences(): Chapter[] {
-    return authors.reduce(
-      (acc, author) =>
-        acc.concat(
-          author.books.reduce(
-            (chapters, book) => [
-              ...chapters,
-              ...book.chapters.map((c) => ({ ...c, book })),
-            ],
-            [] as Chapter[]
-          )
-        ),
-      [] as Chapter[]
-    );
-  }
-
-  private _getChapterReference(id: string): Chapter | undefined {
-    return this._getChaptersReferences().find((c) => c.id === id);
+    return this.http.put<Chapter>(`${this.apiUrl}/${id}`, changes);
   }
 }
