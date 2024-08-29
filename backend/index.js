@@ -52,6 +52,22 @@ app.get("/authors/:id", (req, res) => {
   });
 });
 
+app.get("/authors/:id/books", (req, res) => {
+  const authorId = req.params.id;
+  readAuthorsFile((err, authors) => {
+    if (err) {
+      res.status(500).send("Error reading authors file");
+    } else {
+      const author = authors.find((a) => a.id === authorId);
+      if (!author) {
+        res.status(404).send("Author not found");
+      } else {
+        res.send(author.books.map((b) => ({ ...b, author })));
+      }
+    }
+  });
+});
+
 // PUT update author by ID
 app.put("/authors/:id", (req, res) => {
   const authorId = req.params.id;
