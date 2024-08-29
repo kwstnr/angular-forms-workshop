@@ -1,4 +1,7 @@
-interface Book {
+import { Author } from './author.model';
+import { Chapter } from './chapter.model';
+
+export interface Book {
   id: string;
   title: string;
   isbn: string;

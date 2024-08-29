@@ -1,0 +1,14 @@
+@if(author() | async) {
+<form [formGroup]="form">
+  <input formControlName="firstname" />
+
+  <input readonly formControlName="tpw" />
+
+  @for(book of form.controls.books.controls; track book) {
+  <app-book-form [book]="book" />
+  }
+</form>
+
+} @else {
+<p>Loading...</p>
+}
