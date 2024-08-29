@@ -25,4 +25,12 @@ export class BookService {
   updateBook(id: string, changes: Partial<Book>): Observable<Book> {
     return this.http.put<Book>(`${this.apiUrl}/${id}`, changes);
   }
+
+  // POST create a new book
+  createBook(book: Partial<Book>, authorId: string): Observable<Book> {
+    return this.http.post<Book>(
+      `${this.apiUrl}/authors/${authorId}/books`,
+      book
+    );
+  }
 }
