@@ -127,6 +127,60 @@ app.get("/books/:id", (req, res) => {
   });
 });
 
+app.post("authors/:id/books", (req, res) => {
+  const newBook = req.body;
+  var authorId = req.params.id;
+  readAuthorsFile((err, authors) => {
+    if (err) {
+      res.status(500).send("Error reading authors file");
+    } else {
+      const author = authors.find((a) => a.id === authorId);
+      if (!author) {
+        res.status(404).send("Author not found");
+      } else {
+        author.books.push(newBook);
+        writeAuthorsFile(authors, (err) => {
+          if (err) {
+            res.status(500).send("Error writing authors file");
+          } else {
+            res.send(newBook);
+          }
+        });
+      }
+    }
+  });
+});
+
+app.post("authors/:authorId/books/:bookId/chapter", (req, res) => {
+  const newChapter = req.body;
+  var authorId = req.params.authorId;
+  var bookId = req.params.bookId;
+  readAuthorsFile((err, authors) => {
+    if (err) {
+      res.status(500).send("Error reading authors file");
+    } else {
+      const author = authors.find((a) => a.id === authorId);
+      if (!author) {
+        res.status(404).send("Author not found");
+      } else {
+        const book = author.books.find((b) => b.id === bookId);
+        if (!book) {
+          res.status(404).send("Book not found");
+        } else {
+          book.chapters.push(newChapter);
+          writeAuthorsFile(authors, (err) => {
+            if (err) {
+              res.status(500).send("Error writing authors file");
+            } else {
+              res.send(newChapter);
+            }
+          });
+        }
+      }
+    }
+  });
+});
+
 // PUT update book by ID
 app.put("/books/:id", (req, res) => {
   const bookId = req.params.id;
